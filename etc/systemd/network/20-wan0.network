@@ -1,3 +1,5 @@
+# Use DHCP for the wan0 interface (from ISP)
+
 [Match]
 Name=wan0
 

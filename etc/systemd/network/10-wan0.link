@@ -1,3 +1,5 @@
+# Name the wan0 interface based on its MAC address
+
 [Match]
 MACAddress=78:55:36:04:97:36
 

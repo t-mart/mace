@@ -1,3 +1,5 @@
+# Set a static IP and subnet for lan0
+
 [Match]
 Name=lan0
 
