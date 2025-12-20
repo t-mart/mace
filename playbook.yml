@@ -40,7 +40,7 @@
         src: etc/dnsmasq.conf
         dest: /etc/dnsmasq.conf
         mode: "0644"
-      validate: dnsmasq --test --conf-file %s
+        validate: dnsmasq --test --conf-file %s
       notify: reload-dnsmasq
 
     - name: Configure nftables
@@ -48,7 +48,7 @@
         src: etc/nftables.conf
         dest: /etc/nftables.conf
         mode: "0744"
-      validate: nft -c -f %s
+        validate: nft -c -f %s
       notify: restart-nftables
 
     - name: Ensure stubby directory exists
@@ -59,10 +59,10 @@
 
     - name: Configure stubby
       ansible.builtin.copy:
-        src: stubby/stubby.yml
+        src: etc/stubby/stubby.yml
         dest: /etc/stubby/stubby.yml
         mode: "0644"
-      validate: stubby -i -C %s
+        validate: stubby -i -C %s
       notify: restart-stubby
 
     - name: Enable and start services
@@ -73,8 +73,14 @@
       loop:
         - systemd-networkd
         - dnsmasq
-        - nftables
         - stubby
+
+    - name: Enable nftables
+      # the nftables systemd unit is just a oneshot to update the tables. it's
+      # not a daemon. it doesn't need to be "started", but just enabled.
+      ansible.builtin.systemd:
+        name: nftables
+        enabled: true
 
   handlers:
     - name: Apply sysctl
