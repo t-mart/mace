@@ -1,4 +1,6 @@
-# simsbrook-router
+# mace (router)
+
+![mace, the router!](./docs/mace.jpg)
 
 This router is an Arch Linux system with the following components:
 
@@ -13,8 +15,8 @@ This router is an Arch Linux system with the following components:
 - `nftables` to provide firewall and NAT functionality between `wan0` and `lan0`
   (NAT masquerading, port forwarding, blocking unwanted traffic, etc).
 
-In this repo, we have an Ansible playbook and supporting files to configure this
-router.
+In this repo, we have an [Ansible](https://www.ansible.com/) playbook and
+supporting files to configure this router.
 
 ## Deployment
 

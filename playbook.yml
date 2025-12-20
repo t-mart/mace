@@ -12,6 +12,10 @@
           - stubby
         state: present
 
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: mace
+
     - name: Configure sysctl
       ansible.builtin.copy:
         src: "etc/sysctl.d/{{ item }}"
@@ -40,7 +44,7 @@
         src: etc/dnsmasq.conf
         dest: /etc/dnsmasq.conf
         mode: "0644"
-        validate: dnsmasq --test --conf-file %s
+        validate: dnsmasq --test --conf-file=%s
       notify: reload-dnsmasq
 
     - name: Configure nftables
