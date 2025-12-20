@@ -1,0 +1,106 @@
+---
+- name: Configure Router
+  hosts: router
+  become: true
+
+  tasks:
+    - name: Install required packages
+      community.general.pacman:
+        name:
+          - dnsmasq
+          - nftables
+          - stubby
+        state: present
+
+    - name: Configure sysctl
+      ansible.builtin.copy:
+        src: "etc/sysctl.d/{{ item }}"
+        dest: "/etc/sysctl.d/{{ item }}"
+        mode: "0644"
+      loop:
+        - 10-ipforward.conf
+        - 20-router-tune.conf
+        - 30-swappiness.conf
+      notify: apply-sysctl
+
+    - name: Configure systemd-networkd
+      ansible.builtin.copy:
+        src: "etc/systemd/network/{{ item }}"
+        dest: "/etc/systemd/network/{{ item }}"
+        mode: "0644"
+      loop:
+        - 10-lan0.link
+        - 10-wan0.link
+        - 20-lan0.network
+        - 20-wan0.network
+      notify: reload-systemd-networkd
+
+    - name: Configure dnsmasq
+      ansible.builtin.copy:
+        src: etc/dnsmasq.conf
+        dest: /etc/dnsmasq.conf
+        mode: "0644"
+      validate: dnsmasq --test --conf-file %s
+      notify: reload-dnsmasq
+
+    - name: Configure nftables
+      ansible.builtin.copy:
+        src: etc/nftables.conf
+        dest: /etc/nftables.conf
+        mode: "0744"
+      validate: nft -c -f %s
+      notify: restart-nftables
+
+    - name: Ensure stubby directory exists
+      ansible.builtin.file:
+        path: /etc/stubby
+        state: directory
+        mode: "0755"
+
+    - name: Configure stubby
+      ansible.builtin.copy:
+        src: stubby/stubby.yml
+        dest: /etc/stubby/stubby.yml
+        mode: "0644"
+      validate: stubby -i -C %s
+      notify: restart-stubby
+
+    - name: Enable and start services
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        enabled: true
+        state: started
+      loop:
+        - systemd-networkd
+        - dnsmasq
+        - nftables
+        - stubby
+
+  handlers:
+    - name: Apply sysctl
+      listen: apply-sysctl
+      ansible.builtin.command: sysctl --system
+
+    - name: Reload systemd-networkd
+      listen: reload-systemd-networkd
+      ansible.builtin.systemd:
+        name: systemd-networkd
+        state: reloaded
+
+    - name: Reload dnsmasq
+      listen: reload-dnsmasq
+      ansible.builtin.systemd:
+        name: dnsmasq
+        state: reloaded
+
+    - name: Restart nftables
+      listen: restart-nftables
+      ansible.builtin.systemd:
+        name: nftables
+        state: restarted
+
+    - name: Restart stubby
+      listen: restart-stubby
+      ansible.builtin.systemd:
+        name: stubby
+        state: restarted
