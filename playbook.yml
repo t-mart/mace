@@ -45,7 +45,7 @@
         dest: /etc/dnsmasq.conf
         mode: "0644"
         validate: dnsmasq --test --conf-file=%s
-      notify: reload-dnsmasq
+      notify: restart-dnsmasq
 
     - name: Configure nftables
       ansible.builtin.copy:
@@ -97,11 +97,11 @@
         name: systemd-networkd
         state: reloaded
 
-    - name: Reload dnsmasq
-      listen: reload-dnsmasq
+    - name: Restart dnsmasq
+      listen: restart-dnsmasq
       ansible.builtin.systemd:
         name: dnsmasq
-        state: reloaded
+        state: restarted
 
     - name: Restart nftables
       listen: restart-nftables

@@ -32,7 +32,6 @@
 # where GETDNS_LOG_EMERG is the least and GETDNS_LOG_DEBUG the most verbose.
 log_level: GETDNS_LOG_NOTICE
 
-
 ########################## BASIC & PRIVACY SETTINGS ############################
 # Specifies whether to run as a recursive or stub resolver
 # For stubby this MUST be set to GETDNS_RESOLUTION_STUB
@@ -66,10 +65,10 @@ tls_query_padding_blocksize: 128
 # https://tools.ietf.org/html/rfc7871
 # If you really want to use a resolver that sends ECS (such as Google or one of
 # the Quad9 ones) in order to gain better geo-location of content, then be aware
-# that this will expose a portion of your IP address in queries to some 
+# that this will expose a portion of your IP address in queries to some
 # authoritative servers. You will need to configure that server and also set this
 # parameter to 0 to fully enable ECS.
-edns_client_subnet_private : 1
+edns_client_subnet_private: 1
 
 ############################# CONNECTION SETTINGS ##############################
 # Set to 1 to instruct stubby to distribute queries across all available name
@@ -82,7 +81,7 @@ round_robin_upstreams: 1
 # EDNS0 option for keepalive idle timeout in milliseconds as specified in
 # https://tools.ietf.org/html/rfc7828
 # This keeps idle TLS connections open to avoid the overhead of opening a new
-# connection for every query. Note that if a given server doesn't implement 
+# connection for every query. Note that if a given server doesn't implement
 # EDNS0 keepalive and uses an idle timeout shorter than this stubby will backoff
 # from using that server because the server is always closing the connection.
 # This can degrade performance for certain configurations so reducing the
@@ -111,7 +110,7 @@ idle_timeout: 10000
 
 # Set the acceptable ciphers for DNS over TLS.  With OpenSSL 1.1.1 this list is
 # for TLS1.2 and older only. Ciphers for TLS1.3 should be set with the
-# tls_ciphersuites option. This option can also be given per upstream. 
+# tls_ciphersuites option. This option can also be given per upstream.
 # (default as shown)
 # tls_cipher_list: "EECDH+AESGCM:EECDH+CHACHA20"
 
@@ -173,17 +172,16 @@ appdata_dir: "/var/cache/stubby"
 # dnssec_trust_anchors:
 #   - "/etc/trusted-key.key"
 
-
 ##################################  UPSTREAMS  ################################
 # Specify the list of upstream recursive name servers to send queries to
 # In Strict mode upstreams need either a tls_auth_name or a tls_pubkey_pinset
 # so the upstream can be authenticated.
 # The list below includes various public resolvers and some of the available test
-# servers but only has the getdns developer operated upstream enabled by default. 
+# servers but only has the getdns developer operated upstream enabled by default.
 ###############################################################################
 ####  Users are recommended to use more than one upstream for robustness  #####
 ###############################################################################
-# You can enable other resolvers by uncommenting the relevant 
+# You can enable other resolvers by uncommenting the relevant
 # section below or adding their information directly. Also see this list for
 # other test servers: https://dnsprivacy.org/wiki/display/DP/DNS+Privacy+Test+Servers
 # If you don't have IPv6 then comment then out those upstreams.
@@ -207,83 +205,82 @@ appdata_dir: "/var/cache/stubby"
 # 3) Remove all the upstream_recursive_servers listed below
 
 upstream_recursive_servers:
-############################ DEFAULT UPSTREAM  ################################
-####### IPv4 addresses ######
-### Test servers ###
-# The getdnsapi.net server
-#  - address_data: 185.49.141.37
-#    tls_auth_name: "getdnsapi.net"
-#    tls_pubkey_pinset:
-#      - digest: "sha256"
-#        value: foxZRnIh9gZpWnl+zEiKa0EJ2rdCGroMWm02gaxSc9Q=
-####### IPv6 addresses ######
-### Test servers ###
-# The getdnsapi.net server
-#  - address_data: 2a04:b900:0:100::38
-#    tls_auth_name: "getdnsapi.net"
-#    tls_pubkey_pinset:
-#      - digest: "sha256"
-#        value: foxZRnIh9gZpWnl+zEiKa0EJ2rdCGroMWm02gaxSc9Q=
+  ############################ DEFAULT UPSTREAM  ################################
+  ####### IPv4 addresses ######
+  ### Test servers ###
+  # The getdnsapi.net server
+  # - address_data: 185.49.141.37
+  #   tls_auth_name: "getdnsapi.net"
+  #   tls_pubkey_pinset:
+  #     - digest: "sha256"
+  #       value: foxZRnIh9gZpWnl+zEiKa0EJ2rdCGroMWm02gaxSc9Q=
+  ####### IPv6 addresses ######
+  ### Test servers ###
+  # The getdnsapi.net server
+  #  - address_data: 2a04:b900:0:100::38
+  #    tls_auth_name: "getdnsapi.net"
+  #    tls_pubkey_pinset:
+  #      - digest: "sha256"
+  #        value: foxZRnIh9gZpWnl+zEiKa0EJ2rdCGroMWm02gaxSc9Q=
 
-
-############################ OPTIONAL UPSTREAMS  ###############################
-####### IPv4 addresses ######
-### Anycast services ###
-## Quad 9 'secure' service - Filters, does DNSSEC, doesn't send ECS
-  - address_data: 9.9.9.9
-    tls_auth_name: "dns.quad9.net"
-  - address_data: 149.112.112.112
-    tls_auth_name: "dns.quad9.net"
-## Quad 9 'secure w/ECS' service - Filters, does DNSSEC, DOES send ECS
-## See the entry for `edns_client_subnet_private` for more details on ECS
-#  - address_data: 9.9.9.11
-#    tls_auth_name: "dns11.quad9.net"
-#  - address_data: 149.112.112.11
-#    tls_auth_name: "dns11.quad9.net"
-## Quad 9 'insecure' service - No filtering, no DNSSEC, doesn't send ECS
-#  - address_data: 9.9.9.10
-#    tls_auth_name: "dns10.quad9.net"
-#  - address_data: 149.112.112.10
-#    tls_auth_name: "dns10.quad9.net"
-## Cloudflare 1.1.1.1 and 1.0.0.1
-## (NOTE: recommend reducing idle_timeout to 9000 if using Cloudflare)
-#  - address_data: 1.1.1.1
-#    tls_auth_name: "cloudflare-dns.com"
-#  - address_data: 1.0.0.1
-#    tls_auth_name: "cloudflare-dns.com"
-## The Uncensored DNS servers
-#  - address_data: 91.239.100.100
-#    tls_auth_name: "anycast.censurfridns.dk"
-#    tls_pubkey_pinset:
-#######  pin for "deic-ore.anycast.censurfridns.dk RSA"
-#      - digest: "sha256"
-#        value: 2JjZgBZkfjSjs117vX+AnyKeYzJNM38zwsaxHwStWsg=
-#######  pin for "deic-ore.anycast.censurfridns.dk ECDSA"
-#      - digest: "sha256"
-#        value: UXs8xWXai9ZXBAjDKYDiYl/jbIYtyV/bY2w3F1FFTDs=
-#######  pin for "deic-lgb.anycast.censurfridns.dk RSA"
-#      - digest: "sha256"
-#        value: oDxJrI/lG1Jhl1J7LvapMlYwlHMphZUODvCDBm0nof8=
-#######  pin for "deic-lgb.anycast.censurfridns.dk ECDSA"
-#      - digest: "sha256"
-#        value: iYkCUwXdH7sT8qh26zt+r5dbTySL43wgJtLCTHaSH9M=
-#######  pin for "kracon.anycast.censurfridns.dk RSA"
-#      - digest: "sha256"
-#        value: Clii3HzZr48onFoog7I0ma5QmMPSpOBpCykXqgA0Wn0=
-#######  pin for "kracon.anycast.censurfridns.dk ECDSA"
-#      - digest: "sha256"
-#        value: 6eW98h0+xxuaGQkgNalEU5e/hbgKyUoydpPMY6xcKyY=
-#######  pin for "rgnet-iad.anycast.censurfridns.dk RSA"
-#      - digest: "sha256"
-#        value: sp2Low3+oTsQljNzs3gkYgLRYo7o91t3XGka+pwX//4=
-#######  pin for "rgnet-iad.anycast.censurfridns.dk ECDSA"
-#      - digest: "sha256"
-#        value: /NPc7sIUzKLAQbsvRRhK6Ul3jip6Gi49bxutfrzpsQM=
-## Google
-#  - address_data: 8.8.8.8
-#    tls_auth_name: "dns.google"
-#  - address_data: 8.8.4.4
-#    tls_auth_name: "dns.google"
+  ############################ OPTIONAL UPSTREAMS  ###############################
+  ####### IPv4 addresses ######
+  ### Anycast services ###
+  ## Quad 9 'secure' service - Filters, does DNSSEC, doesn't send ECS
+  # - address_data: 9.9.9.9
+  #   tls_auth_name: "dns.quad9.net"
+  # - address_data: 149.112.112.112
+  #   tls_auth_name: "dns.quad9.net"
+  ## Quad 9 'secure w/ECS' service - Filters, does DNSSEC, DOES send ECS
+  ## See the entry for `edns_client_subnet_private` for more details on ECS
+  # - address_data: 9.9.9.11
+  #   tls_auth_name: "dns11.quad9.net"
+  # - address_data: 149.112.112.11
+  #   tls_auth_name: "dns11.quad9.net"
+  ## Quad 9 'insecure' service - No filtering, no DNSSEC, doesn't send ECS
+  #  - address_data: 9.9.9.10
+  #    tls_auth_name: "dns10.quad9.net"
+  #  - address_data: 149.112.112.10
+  #    tls_auth_name: "dns10.quad9.net"
+  ## Cloudflare 1.1.1.1 and 1.0.0.1
+  ## (NOTE: recommend reducing idle_timeout to 9000 if using Cloudflare)
+  - address_data: 1.1.1.1
+    tls_auth_name: "cloudflare-dns.com"
+  - address_data: 1.0.0.1
+    tls_auth_name: "cloudflare-dns.com"
+  ## The Uncensored DNS servers
+  #  - address_data: 91.239.100.100
+  #    tls_auth_name: "anycast.censurfridns.dk"
+  #    tls_pubkey_pinset:
+  #######  pin for "deic-ore.anycast.censurfridns.dk RSA"
+  #      - digest: "sha256"
+  #        value: 2JjZgBZkfjSjs117vX+AnyKeYzJNM38zwsaxHwStWsg=
+  #######  pin for "deic-ore.anycast.censurfridns.dk ECDSA"
+  #      - digest: "sha256"
+  #        value: UXs8xWXai9ZXBAjDKYDiYl/jbIYtyV/bY2w3F1FFTDs=
+  #######  pin for "deic-lgb.anycast.censurfridns.dk RSA"
+  #      - digest: "sha256"
+  #        value: oDxJrI/lG1Jhl1J7LvapMlYwlHMphZUODvCDBm0nof8=
+  #######  pin for "deic-lgb.anycast.censurfridns.dk ECDSA"
+  #      - digest: "sha256"
+  #        value: iYkCUwXdH7sT8qh26zt+r5dbTySL43wgJtLCTHaSH9M=
+  #######  pin for "kracon.anycast.censurfridns.dk RSA"
+  #      - digest: "sha256"
+  #        value: Clii3HzZr48onFoog7I0ma5QmMPSpOBpCykXqgA0Wn0=
+  #######  pin for "kracon.anycast.censurfridns.dk ECDSA"
+  #      - digest: "sha256"
+  #        value: 6eW98h0+xxuaGQkgNalEU5e/hbgKyUoydpPMY6xcKyY=
+  #######  pin for "rgnet-iad.anycast.censurfridns.dk RSA"
+  #      - digest: "sha256"
+  #        value: sp2Low3+oTsQljNzs3gkYgLRYo7o91t3XGka+pwX//4=
+  #######  pin for "rgnet-iad.anycast.censurfridns.dk ECDSA"
+  #      - digest: "sha256"
+  #        value: /NPc7sIUzKLAQbsvRRhK6Ul3jip6Gi49bxutfrzpsQM=
+  ## Google
+  - address_data: 8.8.8.8
+    tls_auth_name: "dns.google"
+  - address_data: 8.8.4.4
+    tls_auth_name: "dns.google"
 ## Adguard Default servers
 #  - address_data: 176.103.130.130
 #    tls_auth_name: "dns.adguard.com"
@@ -325,10 +322,9 @@ upstream_recursive_servers:
 #    tls_pubkey_pinset:
 #      - digest: "sha256"
 #        value: sG6kj+XJToXwt1M6+9BeCz1SOj/1/mdZn56OZvCyZZc=
-## Foundation for Applied Privacy 
+## Foundation for Applied Privacy
 #  - address_data: 146.255.56.98
 #    tls_auth_name: "dot1.applied-privacy.net"
-
 
 ####### IPv6 addresses #######
 ### Anycast services ###
@@ -343,7 +339,7 @@ upstream_recursive_servers:
 #    tls_auth_name: "dns11.quad9.net"
 #  - address_data: 2620:fe::fe:11
 #    tls_auth_name: "dns11.quad9.net"
-## Quad 9 'insecure' service - No filtering, does DNSSEC, doesn't send ECS 
+## Quad 9 'insecure' service - No filtering, does DNSSEC, doesn't send ECS
 #  - address_data: 2620:fe::10
 #    tls_auth_name: "dns10.quad9.net"
 #  - address_data: 2620:fe::fe:10
@@ -428,7 +424,7 @@ upstream_recursive_servers:
 #    tls_pubkey_pinset:
 #      - digest: "sha256"
 #        value: sG6kj+XJToXwt1M6+9BeCz1SOj/1/mdZn56OZvCyZZc=
-## Foundation for Applied Privacy 
+## Foundation for Applied Privacy
 #  - address_data: 2a02:1b8:10:234::2
 #    tls_auth_name: "dot1.applied-privacy.net"
 
@@ -463,7 +459,7 @@ upstream_recursive_servers:
 #      - digest: "sha256"
 #        value: wTeXHM8aczvhRSi0cv2qOXkXInoDU+2C+M8MpRyT3OI=
 ### A few unicast test servers ###
-## Foundation for Applied Privacy 
+## Foundation for Applied Privacy
 #  - address_data: 146.255.56.98
 #    tls_port: 443
 #    tls_auth_name: "dot1.applied-privacy.net"
