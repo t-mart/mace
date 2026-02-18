@@ -38,7 +38,7 @@ ansible-playbook -i inventory.yml playbook.yml --check --diff
 Run the playbook:
 
 ```bash
-ansible-playbook playbook.yml
+ansible-playbook -i inventory.yml playbook.yml
 ```
 
 ## Common administration tasks
